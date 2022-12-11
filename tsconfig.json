@@ -1,0 +1,16 @@
+{
+  "extends": "@sapphire/ts-config/extra-strict",
+
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "outDir": "./dist",
+
+    "module": "ESNext",
+    "target": "ESNext",
+
+    "composite": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
+
+    "moduleResolution": "Node",
+  }
+}
