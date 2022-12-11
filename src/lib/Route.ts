@@ -1,3 +1,4 @@
+import type { Path } from './App';
 import type { Context, IReplyData } from './Context';
 
 type Handler = (ctx: Context) => IReplyData | Promise<IReplyData>;
@@ -8,7 +9,7 @@ class Route {
 	identity: string | null = null;
 	handler: Handler | null = null;
 
-	constructor(public path: string = '') {}
+	constructor(public path: Path = '/') {}
 
 	// TODO: Improve this
 	get() {
@@ -56,6 +57,6 @@ class Route {
 	// TODO: Add validation; it should be strictly typed (future me: try abusing intersectin types and generics)
 }
 
-const route = (path: string = '') => new Route(path);
+const route = (path: Path = '/') => new Route(path);
 
 export { Route, Handler, route };
