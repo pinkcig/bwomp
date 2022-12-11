@@ -4,6 +4,8 @@ import type { Context, IReplyData } from './Context';
 type Handler = (ctx: Context) => IReplyData | Promise<IReplyData>;
 type WithProperty<T, K extends string> = T & { [P in K]: string };
 
+type ParameterlessMethods<T> = { [K in keyof T]: T[K] extends () => unknown ? K : never }[keyof T];
+
 class Route {
 	method: string | null = null;
 	identity: string | null = null;
@@ -58,5 +60,16 @@ class Route {
 }
 
 const route = (path: Path = '/') => new Route(path);
+const createRouteFn =
+	(method: ParameterlessMethods<Route>) =>
+	(path: Path = '/') =>
+		route(path)[method]();
+
+export const // Breaks syntax-highlighting, lol
+	get = createRouteFn('get'),
+	post = createRouteFn('post'),
+	put = createRouteFn('put'),
+	del = createRouteFn('delete'),
+	patch = createRouteFn('patch');
 
 export { Route, Handler, route };
