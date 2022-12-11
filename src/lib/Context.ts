@@ -1,11 +1,28 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
-import type { Application } from './App';
+import type { Application } from './Application';
 import type { Route } from './Route';
 
+/**
+ * The reply data interface
+ */
 interface IReplyData {
+	/**
+	 * The data to send
+	 */
 	data: unknown;
-	message: string;
-	status: number;
+
+	/**
+	 * The message to send
+	 * @default 'OK'
+	 */
+	message?: string;
+
+	/**
+	 * The status code to send
+	 * @default 200
+	 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+	 */
+	status?: number;
 }
 
 class Context {
@@ -36,7 +53,6 @@ class Context {
 	get response() {
 		return this.#response;
 	}
-
 }
 
 export { Context, IReplyData };

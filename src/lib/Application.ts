@@ -3,13 +3,45 @@ import { fastify, HTTPMethods, type FastifyInstance, type FastifyServerOptions }
 import { Context } from './Context';
 import type { Route } from './Route';
 
+/**
+ * The options for the Application
+ */
 interface IAppOptions {
+	/**
+	 * The port to listen on
+	 */
 	port?: number;
+
+	/**
+	 * The options to pass to Fastify
+	 * @see https://www.fastify.io/docs/latest/Reference/TypeScript
+	 */
 	fastifyOptions?: FastifyServerOptions;
 }
 
+/**
+ * A path, with a leading slash
+ * @example '/api'
+ * @example '/api/v1'
+ */
 type Path = `/${string}`;
 
+/**
+ * The main application class
+ * @example
+ * ```ts
+ * await new Application()
+ * 	.route('/api', new Route('/').get().handle(ctx => ({ status: 200, message: 'Hello, world!' })))
+ * 	.bite();
+ * ```
+ * @example
+ * ```ts
+ * // With utility functions
+ * await bwomp()
+ * 	.route('/api', get('/).handle(ctx => ({ status: 200, message: 'Hello, world!' })))
+ * 	.bite();
+ * ```
+ */
 class Application {
 	#logger = new Logger({ name: 'server' });
 	#server: FastifyInstance;
@@ -20,6 +52,15 @@ class Application {
 		this.#port = port;
 	}
 
+	/**
+	 * Register a route
+	 * @param baseURL The base URL for the route
+	 * @param routes The routes to register
+	 * @example
+	 * ```ts
+	 * <Application>.route('/api', get('/).handle(ctx => ({ status: 200, message: 'Hello, world!' })));
+	 * ```
+	 */
 	route(baseURL: Path, ...routes: Route[]) {
 		/**
 		 * For each handler, register its baseURL + handler.path
@@ -42,6 +83,10 @@ class Application {
 				method: method as HTTPMethods,
 				handler: async (request, reply) => {
 					const result = await handler!(new Context(this, route, request, reply));
+
+					result.message ??= 'OK';
+					result.status ??= 200;
+
 					reply.status(result.status).send(result);
 				},
 			});
@@ -50,6 +95,14 @@ class Application {
 		return this;
 	}
 
+	/**
+	 * Start listening on the specified port
+	 * @param port The port to listen on
+	 * @example
+	 * ```ts
+	 * await <Application>.bite();
+	 * ```
+	 */
 	async bite(port: number = this.#port) {
 		await this.#server.listen({ port });
 
@@ -57,6 +110,9 @@ class Application {
 	}
 }
 
+/**
+ * An alias for `new Application()`
+ */
 const bwomp = (options: IAppOptions = {}) => new Application(options);
 
 export { Application, IAppOptions, Path, bwomp };

@@ -1,4 +1,4 @@
-import type { Path } from './App';
+import type { Path } from './Application';
 import type { Context, IReplyData } from './Context';
 
 type Handler = (ctx: Context) => IReplyData | Promise<IReplyData>;
