@@ -1,6 +1,15 @@
 # 🦈 bwomp
 
-a petite framework built on top of fastify
+<!-- Put .github/assets/bwomp.png image here  -->
+<!-- 
+<img src=".github/assets/bwomp.png" width="200" height="200" />
+
+a petite framework built on top of fastify -->
+
+<div align="center">
+	<img src=".github/assets/bwomp.png" width="200" height="200" />
+	<p>a petite framework built on top of fastify</p>
+</div>
 
 # 📚 examples
 
