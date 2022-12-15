@@ -1,6 +1,7 @@
 import { Logger } from '@pinkcig/console';
 import { fastify, HTTPMethods, type FastifyInstance, type FastifyServerOptions } from 'fastify';
 import { Context } from './Context';
+
 import type { Route } from './Route';
 
 /**
@@ -58,7 +59,7 @@ class Application {
 	 * @param routes The routes to register
 	 * @example
 	 * ```ts
-	 * <Application>.route('/api', get('/).handle(ctx => ({ status: 200, message: 'Hello, world!' })));
+	 * <Application>.route('/api', get('/').handle(ctx => ({ status: 200, message: 'Hello, world!' })));
 	 * ```
 	 */
 	route(baseURL: Path, ...routes: Route[]) {
@@ -80,7 +81,7 @@ class Application {
 
 			this.#server.route({
 				url: baseURL + (path === '/' ? '' : path),
-				method: method as HTTPMethods,
+				method: method as unknown as HTTPMethods,
 				handler: async (request, reply) => {
 					const result = await handler!(new Context(this, route, request, reply));
 

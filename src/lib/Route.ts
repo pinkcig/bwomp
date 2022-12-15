@@ -4,45 +4,18 @@ import type { Context, IReplyData } from './Context';
 type Handler = (ctx: Context) => IReplyData | Promise<IReplyData>;
 type WithProperty<T, K extends string> = T & { [P in K]: string };
 
-type ParameterlessMethods<T> = { [K in keyof T]: T[K] extends () => unknown ? K : never }[keyof T];
-
+const enum RouteMethods {
+	GET = 'GET',
+	POST = 'POST',
+	PUT = 'PUT',
+	DELETE = 'DELETE',
+	PATCH = 'PATCH',
+}
 class Route {
-	method: string | null = null;
 	identity: string | null = null;
 	handler: Handler | null = null;
 
-	constructor(public path: Path = '/') {}
-
-	// TODO: Improve this
-	get() {
-		this.method = 'GET';
-
-		return this as WithProperty<typeof this, 'method'>;
-	}
-
-	post() {
-		this.method = 'POST';
-
-		return this as WithProperty<typeof this, 'method'>;
-	}
-
-	put() {
-		this.method = 'PUT';
-
-		return this as WithProperty<typeof this, 'method'>;
-	}
-
-	delete() {
-		this.method = 'DELETE';
-
-		return this as WithProperty<typeof this, 'method'>;
-	}
-
-	patch() {
-		this.method = 'PATCH';
-
-		return this as WithProperty<typeof this, 'method'>;
-	}
+	constructor(public path: Path = '/', public method: RouteMethods = RouteMethods.GET) {}
 
 	identify(identity: string) {
 		this.identity = identity;
@@ -59,17 +32,17 @@ class Route {
 	// TODO: Add validation; it should be strictly typed (future me: try abusing intersectin types and generics)
 }
 
-const route = (path: Path = '/') => new Route(path);
+const route = (...params: ConstructorParameters<typeof Route>) => new Route(...params);
 const createRouteFn =
-	(method: ParameterlessMethods<Route>) =>
+	(method: RouteMethods) =>
 	(path: Path = '/') =>
-		route(path)[method]();
+		route(path, method);
 
 export const // Breaks syntax-highlighting, lol
-	get = createRouteFn('get'),
-	post = createRouteFn('post'),
-	put = createRouteFn('put'),
-	del = createRouteFn('delete'),
-	patch = createRouteFn('patch');
+	get = createRouteFn(RouteMethods.GET),
+	post = createRouteFn(RouteMethods.POST),
+	put = createRouteFn(RouteMethods.PUT),
+	del = createRouteFn(RouteMethods.DELETE),
+	patch = createRouteFn(RouteMethods.PATCH);
 
-export { Route, Handler, route };
+export { Route, Handler, route, RouteMethods };
