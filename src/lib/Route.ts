@@ -80,6 +80,12 @@ const createRouteFn =
 	(path: Path = '/') =>
 		route(path, method);
 
+/**
+ * Erase type-signature of routes, so that they can be used in the application.
+ * TODO: Find a better way to do this.
+ */
+const $ = (...routes: unknown[]) => routes as Route<Validation>[];
+
 const // Breaks syntax-highlighting, lol
 	get = createRouteFn(RouteMethods.GET),
 	post = createRouteFn(RouteMethods.POST),
@@ -87,4 +93,4 @@ const // Breaks syntax-highlighting, lol
 	del = createRouteFn(RouteMethods.DELETE),
 	patch = createRouteFn(RouteMethods.PATCH);
 
-export { Route, Handler, route, RouteMethods, Validation, ValidatorDictionary, get, post, put, del, patch };
+export { Route, Handler, route, RouteMethods, Validation, ValidatorDictionary, get, post, put, del, patch, $ };

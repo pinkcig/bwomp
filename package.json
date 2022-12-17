@@ -25,7 +25,7 @@
 	},
 	"dependencies": {
 		"@pinkcig/console": "^1.0.3",
-		"@sapphire/shapeshift": "^3.8.0",
+		"@sapphire/shapeshift": "3.8.1",
 		"fastify": "^4.10.2"
 	},
 	"devDependencies": {
