@@ -1,7 +1,7 @@
 # 🦈 bwomp
 
 <!-- Put .github/assets/bwomp.png image here  -->
-<!-- 
+<!--
 <img src=".github/assets/bwomp.png" width="200" height="200" />
 
 a petite framework built on top of fastify -->
@@ -14,18 +14,16 @@ a petite framework built on top of fastify -->
 # 📚 examples
 
 ```ts
-import { bwomp, route } from 'bwomp';
+import { bwomp, get, post } from 'bwomp';
 
-const ping = route()
-	.get()
+const ping = get()
 	.identify('ping') // used for logging; optional
 	.handle(({ reply }) => ({ message: 'pong', status: 200 }));
 
-const welcome = route()
-	.get()
+const welcome = post()
 	.identify('welcome')
 	.body({ name: 'string' }) // wip
-	.handle(({ reply, data }) => ({ message: `${data.name}`, status: 200 }));
+	.handle(({ reply, data: { body } }) => ({ message: `${body.name}`, status: 200 }));
 
 await bwomp() //
 	.route('/api/v1', ping, welcome)

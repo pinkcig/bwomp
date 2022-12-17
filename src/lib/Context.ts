@@ -1,6 +1,9 @@
+import type { ObjectValidator } from '@sapphire/shapeshift';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { Application } from './Application';
-import type { Route } from './Route';
+import type { Route, Validation, ValidatorDictionary } from './Route';
+
+type WrapDictionary<V extends ValidatorDictionary | undefined> = ObjectValidator<NonNullable<V>>;
 
 /**
  * The reply data interface
@@ -25,13 +28,17 @@ interface IReplyData {
 	status?: number;
 }
 
-class Context {
+class Context<V extends Validation> {
 	#app: Application;
-	#route: Route;
+	#route: Route<V>;
 	#request: FastifyRequest;
 	#response: FastifyReply;
 
-	constructor(app: Application, route: Route, request: FastifyRequest, response: FastifyReply) {
+	bodyShape!: WrapDictionary<V['body']>;
+	queryShape!: WrapDictionary<V['query']>;
+	paramsShape!: WrapDictionary<V['params']>;
+
+	constructor(app: Application, route: Route<V>, request: FastifyRequest, response: FastifyReply) {
 		this.#app = app;
 		this.#route = route;
 		this.#request = request;
@@ -55,4 +62,4 @@ class Context {
 	}
 }
 
-export { Context, IReplyData };
+export { Context, IReplyData, WrapDictionary };
