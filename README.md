@@ -1,4 +1,4 @@
-# 🦈 bwomp
+
 
 <!-- Put .github/assets/bwomp.png image here  -->
 <!--
@@ -14,18 +14,19 @@ a petite framework built on top of fastify -->
 # 📚 examples
 
 ```ts
-import { bwomp, get, post } from 'bwomp';
+import { s } from '@sapphire/shapeshift';
+import { bwomp, get, post, $ } from 'bwomp';
 
-const ping = get()
+const ping = get('/')
 	.identify('ping') // used for logging; optional
 	.handle(({ reply }) => ({ message: 'pong', status: 200 }));
 
-const welcome = post()
+const welcome = post('/welcome')
 	.identify('welcome')
-	.body({ name: 'string' }) // wip
-	.handle(({ reply, data: { body } }) => ({ message: `${body.name}`, status: 200 }));
+	.body({ name: s.string })
+	.handle(({ reply, body }) => ({ message: `${body.name}`, status: 200 }));
 
 await bwomp() //
-	.route('/api/v1', ping, welcome)
+	.route('/api/v1', ...$(ping, welcome)) // $ is a helper function to erase type signatures
 	.bite(3000);
 ```
