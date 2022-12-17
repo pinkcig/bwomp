@@ -34,12 +34,12 @@ interface Validation<
 type Handler<V extends Validation> = (ctx: Context<V>) => IReplyData | Promise<IReplyData>;
 
 class Route<V extends Validation> {
-	identity: string | null = null;
-	handler: Handler<V> | null = null;
+	identity?: string;
+	handler?: Handler<V>;
 
-	bodyShape: V['body'] | null = null;
-	queryShape: V['query'] | null = null;
-	paramsShape: V['params'] | null = null;
+	bodyShape?: V['body'];
+	queryShape?: V['query'];
+	paramsShape?: V['params'];
 
 	constructor(public path: Path = '/', public method: RouteMethods = RouteMethods.GET) {}
 

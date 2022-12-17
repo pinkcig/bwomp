@@ -1,9 +1,13 @@
-import type { ObjectValidator } from '@sapphire/shapeshift';
+import { BaseValidator, s } from '@sapphire/shapeshift';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { Application } from './Application';
-import type { Route, Validation, ValidatorDictionary } from './Route';
+import type { Route, Validation } from './Route';
 
-type WrapDictionary<V extends ValidatorDictionary | undefined> = ObjectValidator<NonNullable<V>>;
+// InferType wouldn't work here so we have to improvise.
+type UnwrapValidator<T extends BaseValidator<unknown>> = T extends BaseValidator<infer V> ? V : never;
+type UnwrapValidatorDictionary<T extends Record<string, BaseValidator<unknown>>> = {
+	[P in keyof T]: UnwrapValidator<T[P]>;
+};
 
 /**
  * The reply data interface
@@ -28,21 +32,36 @@ interface IReplyData {
 	status?: number;
 }
 
+interface IContextOptions<V extends Validation> {
+	app: Application;
+	route: Route<V>;
+	request: FastifyRequest;
+	response: FastifyReply;
+
+	bodyShape: V['body'];
+	queryShape: V['query'];
+	paramsShape: V['params'];
+}
+
 class Context<V extends Validation> {
 	#app: Application;
 	#route: Route<V>;
 	#request: FastifyRequest;
 	#response: FastifyReply;
 
-	bodyShape!: WrapDictionary<V['body']>;
-	queryShape!: WrapDictionary<V['query']>;
-	paramsShape!: WrapDictionary<V['params']>;
+	body!: UnwrapValidatorDictionary<NonNullable<V['body']>>;
+	query!: UnwrapValidatorDictionary<NonNullable<V['query']>>;
+	params!: UnwrapValidatorDictionary<NonNullable<V['params']>>;
 
-	constructor(app: Application, route: Route<V>, request: FastifyRequest, response: FastifyReply) {
+	constructor({ app, route, request, response, bodyShape, queryShape, paramsShape }: IContextOptions<V>) {
 		this.#app = app;
 		this.#route = route;
 		this.#request = request;
 		this.#response = response;
+
+		if (bodyShape) this.body = s.object(bodyShape).parse(request.body);
+		if (queryShape) this.query = s.object(queryShape).parse(request.query);
+		if (paramsShape) this.params = s.object(paramsShape).parse(request.params);
 	}
 
 	get app() {
@@ -62,4 +81,4 @@ class Context<V extends Validation> {
 	}
 }
 
-export { Context, IReplyData, WrapDictionary };
+export { Context, IReplyData };

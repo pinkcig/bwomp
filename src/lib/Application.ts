@@ -2,7 +2,7 @@ import { Logger } from '@pinkcig/console';
 import { fastify, HTTPMethods, type FastifyInstance, type FastifyServerOptions } from 'fastify';
 import { Context } from './Context';
 
-import type { Route } from './Route';
+import type { Route, Validation } from './Route';
 
 /**
  * The options for the Application
@@ -62,7 +62,7 @@ class Application {
 	 * <Application>.route('/api', get('/').handle(ctx => ({ status: 200, message: 'Hello, world!' })));
 	 * ```
 	 */
-	route(baseURL: Path, ...routes: Route[]) {
+	route(baseURL: Path, ...routes: Route<Validation>[]) {
 		/**
 		 * For each handler, register its baseURL + handler.path
 		 */
@@ -83,7 +83,18 @@ class Application {
 				url: baseURL + (path === '/' ? '' : path),
 				method: method as unknown as HTTPMethods,
 				handler: async (request, reply) => {
-					const result = await handler!(new Context(this, route, request, reply));
+					const result = await handler!(
+						new Context({
+							request,
+							route,
+
+							bodyShape: route.bodyShape,
+							queryShape: route.queryShape,
+							paramsShape: route.paramsShape,
+							response: reply,
+							app: this,
+						}),
+					);
 
 					result.message ??= 'OK';
 					result.status ??= 200;
